@@ -70,6 +70,20 @@
 18. Channel::ChannelRequest::MethodId::DATA_CONSUMER_GET_BUFFERED_AMOUNT:
 19. Channel::ChannelRequest::MethodId::DATA_CONSUMER_SET_BUFFERED_AMOUNT_LOW_THRESHOLD:
 
+    因为在创建transport时候,已经分成webrtc/plain/pipe所以默认的调用的是webrtctransport
+    然后在webrtctransport调用父类transport的回调。
+##### 1.2.2.3.1 webrtc
+ - WebRtcTransport::HandleRequest
+1. Channel::ChannelRequest::MethodId::TRANSPORT_CONNECT
+2. Channel::ChannelRequest::MethodId::TRANSPORT_RESTART_ICE
+##### 1.2.2.3.2 plain
+ - PlainTransport::HandleRequest
+1. Channel::ChannelRequest::MethodId::TRANSPORT_CONNECT
+
+##### 1.2.2.3.3 pipe
+ - PipeTransport::HandleRequest
+1. Channel::ChannelRequest::MethodId::TRANSPORT_CONNECT
+
 #### 1.2.2.4 producer回调
 - Producer::HandleRequest(Channel::ChannelRequest* request)
 1. Channel::ChannelRequest::MethodId::PRODUCER_DUMP:
@@ -87,6 +101,20 @@
 6. Channel::ChannelRequest::MethodId::CONSUMER_SET_PRIORITY:
 7. Channel::ChannelRequest::MethodId::CONSUMER_REQUEST_KEY_FRAME:
 8. case Channel::ChannelRequest::MethodId::CONSUMER_ENABLE_TRACE_EVENT:
+
+    因为在创建comsumer的时候，是按照PipeConsumer/SimpleConsumer/SimulcastConsumer/SvcConsumer
+    格式创建的，所以先执行子类的回到，然后通过子类调用父类的
+
+##### 1.2.2.5.1 pipecomsumer
+ - PipeConsumer::HandleRequest
+1. Channel::ChannelRequest::MethodId::CONSUMER_REQUEST_KEY_FRAME
+2. Channel::ChannelRequest::MethodId::CONSUMER_SET_PREFERRED_LAYERS
+
+##### 1.2.2.5.2 
+ - SimpleConsumer::HandleRequest
+1. Channel::ChannelRequest::MethodId::CONSUMER_REQUEST_KEY_FRAME
+2. Channel::ChannelRequest::MethodId::CONSUMER_SET_PREFERRED_LAYERS
+
 #### 1.2.2.6 data producer回调
 DataProducer::HandleRequest
 1. Channel::ChannelRequest::MethodId::DATA_PRODUCER_DUMP:
