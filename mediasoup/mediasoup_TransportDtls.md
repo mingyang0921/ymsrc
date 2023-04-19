@@ -2,10 +2,29 @@
 
 
 ## 一、总叙述
-1. webrtc使用https/wss进行createWebRtcTransport或connect
-2. createWebRtcTransport返回dtlsParameters给客户端
-3. 客户端connect时,使用dtlsParameters,并使用ssl握手
-4. 客户端使用tcp/udp连接
+### 1.1 webrtc连接过程
+1. 通过服务器使用安全协议(https/wss等)获取对端的sdp
+2. 双方dtls协商连接后,通过SSL_get_peer_certificate获取对端fingerprint
+3. 比较sdp中的fingerprint,相同表示连接成功
+4. 调动SSL_export_keying_material接口获取srtp接收和发送秘钥对
+5. 初始化接收和发送srtp
+6. 接收rtp/rtcp消息，使用recv srtp进行解码
+7. 发送rtp/rtcp消息，使用send srtp进行编码
+
+### 1.2 dtls的作用
+dtls主要作用是交换srtp的秘钥对
+
+### 1.3 技术
+1. https/wss
+2. ssl/dtls
+3. srtp
+
+### 1.4 mediasoup如何调用
+1. mediasoup接收wss消息通过unixsocket传递给worker
+2. woker找到router创建webrtcTransport
+3. 建立tcp/udp server，等待客户端进行dtls连接
+4. dtls连接成功后，交换srtp密钥对
+5. 发送加密数据
 
 ## 二、TCP调用流程
 
